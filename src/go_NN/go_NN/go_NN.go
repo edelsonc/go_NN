@@ -8,21 +8,24 @@ import (
 )
 
 func main() {
-    // set a random seed and them initialize parameters between -5 and 5
+    // set a random seed
     rand.Seed(time.Now().Unix())
 
     // create data arrays and populate them with noisy data; in this case we
-    // have a line with N(0, 1) random errors
+    // have the line y = 5.0 * x + 22.4 + e, with e ~ N(0, 1) random errors
+    N := 100
     var x_vals [100]float64
     var y_vals [100]float64
     x_i := 0.0
-    for i := 0; i < 100; i++ {
+    for i := 0; i < N; i++ {
         x_vals[i] = x_i
         y_vals[i] = 5.0 * x_vals[i] + 22.4 + rand.NormFloat64()
         x_i++ 
     }
 
-    // define units
+    // We now need to setup our neural network. For this we need to define each
+    // gate and its corresponding inputs and outputs. Here we define all of
+    // the input and output Units...
     var b0 gates.Unit
     var b1 gates.Unit
     var x gates.Unit
@@ -32,19 +35,24 @@ func main() {
     var er gates.Unit
     var sqr_er gates.Unit
 
-    // define gates
+    // ..and here we define all of the gates and how they connect Units
     multgate := gates.MultiplyGate{ &b1, &x, &b1x }
     addgate := gates.AddGate{ &b1x, &b0, &y_hat }
     subgate := gates.SubGate{ &y, &y_hat, &er }
     powergate := gates.PowerGate{ &er, &sqr_er, 2 }
 
-    // set initial random value for the betas
+    // We are now ready to begin training our neural net; we start by defining
+    // random initial parameters between -5 and 5.
     b0.Value, b1.Value = rand.Float64() * 5 - 2.5, rand.Float64() * 5 - 2.5
     
-    // create an index for randomly selecting a variable and begin training
-    var idx int
+    // Next we begin stocastic gradient descent; this is done by randomly
+    // picking one of our data points and then forward and backpropogating the
+    // network with its values. Following this, we update the beta parameters
+    // using the comptued gradients and the learning rate alpha
     alpha := 0.0001
-    for i := 0; i <= 100000; i++ {
+    iters := 100000
+    var idx int
+    for i := 0; i <= iters; i++ {
         // pick random training point and assign value to x and y
         idx = rand.Intn(100)
         x.Value, y.Value = x_vals[idx], y_vals[idx]
@@ -55,21 +63,21 @@ func main() {
         subgate.Forward()
         powergate.Forward()
 
-        // backward propogation
+        // backward propogation; output units grad is 1 for proper backprop
         sqr_er.Gradient = 1.0
         powergate.Backward()
         subgate.Backward()
         addgate.Backward()
         multgate.Backward()
 
-        // update beta parameters with learning rate alpha
-        // fmt.Println(b0.Value, b1.Value)
-        //fmt.Println("\t", b0.Gradient, b1.Gradient)
+        // update beta parameters with learning rate alpha and the gradient
         b0.Value = b0.Value - alpha * b0.Gradient
         b1.Value = b1.Value - alpha * b1.Gradient
     }
     
     // final model fit
-    fmt.Println(b0.Value, b1.Value)
+    fmt.Println("\nTraining data: y = 5x + 22.4 + e where e ~ N(0, 1)")
+    fmt.Println("Training Epochs:", iters / N, "; learning rate: ", alpha)
+    fmt.Println("Output model: y =", b1.Value, "x +", b0.Value)
 }
 
