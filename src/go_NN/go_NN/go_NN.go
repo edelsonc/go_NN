@@ -44,7 +44,7 @@ func main() {
     // create an index for randomly selecting a variable and begin training
     var idx int
     alpha := 0.01
-    for i := 0; i <= 50000; i++ {
+    for i := 0; i <= 100000; i++ {
         // pick random training point and assign value to x and y
         idx = rand.Intn(20)
         x.Value, y.Value = hours[idx], pass[idx]
@@ -64,22 +64,12 @@ func main() {
         addgate.Backward()
         multgate.Backward()
 
-        // fmt.Println(x.Value * b1.Value + b0.Value, b1x_b0.Value )
-        // fmt.Println(y.Value - y_hat.Value, er.Value)
 
         // update the beta parameters
-        // fmt.Println(b0.Value, b1.Value)
-        //fmt.Println("\t", b0.Gradient, b1.Gradient, er.Gradient)
         b0.Value = b0.Value - alpha * b0.Gradient
         b1.Value = b1.Value - alpha * b1.Gradient
     }
     
     fmt.Println(b0.Value, b1.Value)
-
-    // // print the gradient and values
-    // fmt.Println("\nSimple example of an add and multiply gates output: z * (x + y)")
-    // fmt.Println("\tx:", x.Value, ", y:", y.Value, " z:", z.Value)
-    // fmt.Println("\txy:", xy.Value, ", zxy:", zxy.Value)
-    // fmt.Println("\tz.grad:", z.Gradient)
 }
 
