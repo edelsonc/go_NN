@@ -9,6 +9,13 @@ type Unit struct {
 }
 
 
+// interface for all gate types
+type Gate interface {
+    Forward()
+    Backward()
+}
+
+
 // MultiplyGate structure and traits
 type MultiplyGate struct {
     U0 *Unit
