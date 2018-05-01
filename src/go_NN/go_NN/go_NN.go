@@ -10,15 +10,16 @@ import (
 func main() {
     // set a random seed and them initialize parameters between -5 and 5
     rand.Seed(time.Now().Unix())
-    beta_0, beta_1 = rand.Float64() * 10 - 5, rand.Float64() * 10 - 5
 
     // create data arrays and populate them with noisy data; in this case we
     // have a line with N(0, 1) random errors
     var x_vals [100]float64
     var y_vals [100]float64
+    x_i := 0.0
     for i := 0; i < 100; i++ {
-        x_vals[i] = i
-        y_vals[i] = beta_1 * x_vals[i] + beta_0 + rand.NormFloat64()  
+        x_vals[i] = x_i
+        y_vals[i] = 5.0 * x_vals[i] + 22.4 + rand.NormFloat64()
+        x_i++ 
     }
 
     // define units
@@ -38,15 +39,15 @@ func main() {
     powergate := gates.PowerGate{ &er, &sqr_er, 2 }
 
     // set initial random value for the betas
-    b0.Value, b1.Value = rand.Float64() * 10 - 5, rand.Float64() * 10 - 5
+    b0.Value, b1.Value = rand.Float64() * 5 - 2.5, rand.Float64() * 5 - 2.5
     
     // create an index for randomly selecting a variable and begin training
     var idx int
-    alpha := 0.01
-    for i := 0; i <= 50000; i++ {
+    alpha := 0.0001
+    for i := 0; i <= 100000; i++ {
         // pick random training point and assign value to x and y
         idx = rand.Intn(100)
-        x.Value, y.Value = hours[idx], pass[idx]
+        x.Value, y.Value = x_vals[idx], y_vals[idx]
         
         // forward propagation
         multgate.Forward()
@@ -62,6 +63,8 @@ func main() {
         multgate.Backward()
 
         // update beta parameters with learning rate alpha
+        // fmt.Println(b0.Value, b1.Value)
+        //fmt.Println("\t", b0.Gradient, b1.Gradient)
         b0.Value = b0.Value - alpha * b0.Gradient
         b1.Value = b1.Value - alpha * b1.Gradient
     }
