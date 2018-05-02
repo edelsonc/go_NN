@@ -7,7 +7,6 @@ import (
     "time"
 )
 
-
 func linear_regression_example() {
     // set a random seed
     rand.Seed(time.Now().Unix())
@@ -156,6 +155,11 @@ func logistic_regression_example() {
 func main() {
     linear_regression_example()
     logistic_regression_example()
+    // var gate_slice []*gates.AddGate
+    // for i:=0; i<=10; i++ {
+    //     gate_slice = append(gate_slice, &gates.AddGate{})
+    // }
+    // fmt.Println(gate_slice)
 }
 
 
