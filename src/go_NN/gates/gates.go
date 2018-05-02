@@ -28,7 +28,7 @@ func (g MultiplyGate) Forward() {
     g.UOut.Value, g.UOut.Gradient = g.U0.Value * g.U1.Value, 0.0
 }
 
-func (g *MultiplyGate) Backward() {
+func (g MultiplyGate) Backward() {
     g.U0.Gradient = g.U0.Gradient + g.UOut.Gradient * g.U1.Value
     g.U1.Gradient = g.U1.Gradient + g.UOut.Gradient * g.U0.Value
 }

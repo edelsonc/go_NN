@@ -1,6 +1,8 @@
 package nodes
 
-import "go_NN/gates"
+import (
+    "go_NN/gates"
+)
 
 type SigmoidNode struct {
     // First Coefficient
@@ -60,5 +62,19 @@ func NewSigmoidNode(b0 *gates.Unit, x0 *gates.Unit, b1 *gates.Unit, x1 *gates.Un
     }
 }
 
+func (n SigmoidNode) Forward() {
+    n.Mult0.Forward()
+    n.Mult1.Forward()
+    n.P0.Forward()
+    n.P1.Forward()
+    n.S0.Forward()
+}
 
+func (n SigmoidNode) Backward() {
+    n.S0.Backward()
+    n.P1.Backward()
+    n.P0.Backward()
+    n.Mult1.Backward()
+    n.Mult0.Backward()
+}
 
