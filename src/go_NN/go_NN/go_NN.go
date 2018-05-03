@@ -110,7 +110,7 @@ func logistic_regression_example() {
 
     // define all of our gates
     signode := nodes.NewSigmoidNode(&b0, &x0, &b1, &x1, &bias)
-    subgate := gates.SubGate{ &y, &signode.UOut_s0, &er }
+    subgate := gates.SubGate{ &y, signode.UOut_s0, &er }
     powergate := gates.PowerGate{ &er, &sqr_er, 2 }
 
     // set initial random value for the betas
@@ -122,8 +122,8 @@ func logistic_regression_example() {
 
     // create an index for randomly selecting a variable and begin training
     var idx int
-    alpha := 0.01
-    for i := 0; i <= 4; i++ {
+    alpha := 0.1
+    for i := 0; i <= 100000; i++ {
         // pick random training point and assign value to x and y
         idx = rand.Intn(20)
         signode.X1.Value, y.Value = hours[idx], pass[idx]
@@ -140,7 +140,6 @@ func logistic_regression_example() {
         signode.Backward()
 
         // update the beta parameters
-        fmt.Println(signode.Beta1, signode.Bias, signode.UOut_s0)
         signode.Beta1.Value = signode.Beta1.Value - alpha * signode.Beta1.Gradient
         signode.Bias.Value = signode.Bias.Value - alpha * signode.Bias.Gradient
     }
@@ -151,25 +150,10 @@ func logistic_regression_example() {
     fmt.Println("\tOutput Model: y = sigmoid(", signode.Beta1.Value, "x +", signode.Bias.Value, ")")
 }
 
-func signode_example() {
-    b0 := gates.Unit{ 1, 0 }
-    b1 := gates.Unit{ 1, 0 }
-    x0 := gates.Unit{ 0.25, 0 }
-    x1 := gates.Unit{ 0.25, 0 }
-    bias := gates.Unit{ 0 , 0 }
-    
-    signode := nodes.NewSigmoidNode(&b0, &x0, &b1, &x1, &bias)
-    signode.Mult0.U0 = &b0
-    signode.Mult0.U1 = &x0
-    signode.Mult0.UOut = &x1
-    signode.Mult0.Forward()
-    fmt.Println(x1)
-}
-
 func main() {
     // linear_regression_example()
-    // logistic_regression_example()
-    signode_example()
+    logistic_regression_example()
+   //  signode_example()
 }
 
 
