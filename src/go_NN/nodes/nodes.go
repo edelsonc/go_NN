@@ -37,12 +37,6 @@ func NewSigmoidNode(b0 *gates.Unit, x0 *gates.Unit, b1 *gates.Unit, x1 *gates.Un
     uOut_p1 := &gates.Unit{}
     uOut_s0 := &gates.Unit{}
 
-    // var m0 gates.MultiplyGate
-    // var m1 gates.MultiplyGate
-    // var p0 gates.AddGate
-    // var p1 gates.AddGate
-    // var s0 gates.SigmoidGate
-
     m0 := &gates.MultiplyGate{ b0, x0, uOut_m0 }
     m1 := &gates.MultiplyGate{ b1, x1, uOut_m1 }
     p0 := &gates.AddGate{ uOut_m0, uOut_m1, uOut_p0 }
