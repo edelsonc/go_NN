@@ -9,9 +9,6 @@ import (
 )
 
 func linear_regression_example() {
-    // set a random seed
-    rand.Seed(time.Now().Unix())
-
     // create data arrays and populate them with noisy data; in this case we
     // have the line y = 5.0 * x + 22.4 + e, with e ~ N(0, 1) random errors
     N := 100
@@ -85,7 +82,9 @@ func linear_regression_example() {
 
 
 func logistic_regression_example() {
-    // An example of the network using logistic regression; students study/pass
+    // An example of the network using logistic regression; here we'll look at
+    // the data set of numbers of hours spent studying and if a student passed
+    // a test. We initialize the arrays below
     hours := [20]float64{0.50, 0.75, 1.00, 1.25, 1.50,
                          1.75, 1.75, 2.00, 2.25, 2.50,
                          2.75, 3.00, 3.25, 3.50, 4.00,
@@ -96,31 +95,35 @@ func logistic_regression_example() {
                         1, 0, 1, 0, 1,
                         1, 1, 1, 1, 1}
 
-    // define all of the units for input to SigmoidNode
+    // For this example we will be using a SigmoidNode in addition to our
+    // normals gates. First we define all of the units for the inputs to the
+    // SigmoidNode. This gives us the basic structure of logistic regression
     var b0 gates.Unit
     var b1 gates.Unit
     var x0 gates.Unit
     var x1 gates.Unit
     var bias gates.Unit
 
-    // Unit for computing square error
+    // However, to optimize we need square error; these units will compute that
     var y gates.Unit
     var er gates.Unit
     var sqr_er gates.Unit
 
-    // define all of our gates
+    // Next we create our networks gates; notice that the node is replacing
+    // four individual gates. This means we no longer need to manually create
+    // and populate these gates.
     signode := nodes.NewSigmoidNode(&b0, &x0, &b1, &x1, &bias)
     subgate := gates.SubGate{ &y, signode.UOut_s0, &er }
     powergate := gates.PowerGate{ &er, &sqr_er, 2 }
 
-    // set initial random value for the betas
-    rand.Seed( time.Now().Unix() )
+    // set initial random value for the betas; typical for new nets
     signode.Beta1.Value, signode.Bias.Value = rand.Float64() * 5 - 2.5, rand.Float64() * 5 - 2.5
     
-    // we set b0 and x0 to zero since we're only doing univarient
+    // b0 and x0 to zero since we're only doing univarient logistic regression
     signode.Beta0.Value, signode.X0.Value = 0.0, 0.0
 
-    // create an index for randomly selecting a variable and begin training
+    // Now we will use our net to perform stocastic gradient descent and find
+    // parameters for our logistic regression
     var idx int
     alpha := 0.1
     for i := 0; i <= 100000; i++ {
@@ -151,9 +154,11 @@ func logistic_regression_example() {
 }
 
 func main() {
-    // linear_regression_example()
+    // random seed for new results
+    rand.Seed(time.Now().Unix())
+    
+    // example networks
+    linear_regression_example()
     logistic_regression_example()
-   //  signode_example()
 }
-
 
