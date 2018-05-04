@@ -2,6 +2,7 @@ package nodes
 
 import (
     "go_NN/gates"
+    "fmt"
 )
 
 type SigmoidNode struct {
@@ -76,5 +77,54 @@ func (n SigmoidNode) Backward() {
     n.Plus0.Backward()
     n.Mult1.Backward()
     n.Mult0.Backward()
+}
+
+
+// sum node; just needs to add all of the units together
+type SumNode struct {
+    Inputs []*gates.Unit
+    Intermediates []*gates.Unit
+    SumGates []*gates.AddGate
+}
+
+func NewSumNode(inputs []*gates.Unit) SumNode {
+    N_inputs := len(inputs)
+    N_gates := N_inputs - 1
+    intermediates := make([]*gates.Unit, N_gates)
+    sumgates := make([]*gates.AddGate, N_gates)
+    for i:=0; i<N_gates; i++ {
+        inter := &gates.Unit{}
+        sgate := &gates.AddGate{}
+        intermediates[i] = inter
+        sumgates[i] = sgate
+    }
+    
+    sumgates[0].U0 = inputs[0]
+    sumgates[0].U1 = inputs[1]
+    sumgates[0].UOut = intermediates[0]
+    for i:=0; i<(N_gates - 1); i++ {
+        sumgates[i + 1].U0 = intermediates[i]
+        sumgates[i + 1].U1 = inputs[i + 1]
+        sumgates[i + 1].UOut = intermediates[i + 1]
+    }
+
+    fmt.Println("here")
+    return SumNode {
+        Inputs: inputs,
+        Intermediates: intermediates,
+        SumGates: sumgates,
+    }
+}
+
+func (n SumNode) Forward() {
+    for _, gate := range n.SumGates {
+        gate.Forward()
+    }
+}
+
+func (n SumNode) Backward() {
+    for i:=len(n.SumGates) - 1; i >= 0; i-- {
+        n.SumGates[i].Backward()
+    }
 }
 
