@@ -43,7 +43,7 @@ func linear_regression_example() {
     // random initial parameters between -5 and 5.
     b0.Value, b1.Value = rand.Float64() * 5 - 2.5, rand.Float64() * 5 - 2.5
     
-    // Next we begin stocastic gradient descent; this is done by randomly
+    // Next we begin stochastic gradient descent; this is done by randomly
     // picking one of our data points and then forward and backpropogating the
     // network with its values. Following this, we update the beta parameters
     // using the comptued gradients and the learning rate alpha
@@ -122,11 +122,12 @@ func logistic_regression_example() {
     // b0 and x0 to zero since we're only doing univarient logistic regression
     signode.Beta0.Value, signode.X0.Value = 0.0, 0.0
 
-    // Now we will use our net to perform stocastic gradient descent and find
+    // Now we will use our net to perform stochastic gradient descent and find
     // parameters for our logistic regression
     var idx int
     alpha := 0.1
-    for i := 0; i <= 100000; i++ {
+	iters := 100000
+    for i := 0; i <= iters; i++ {
         // pick random training point and assign value to x and y
         idx = rand.Intn(20)
         signode.X1.Value, y.Value = hours[idx], pass[idx]
@@ -170,8 +171,7 @@ func main() {
     rand.Seed(time.Now().Unix())
     
     // example networks
-    // linear_regression_example()
+	linear_regression_example()
     // logistic_regression_example()
-    sum_example()
+    // sum_example()
 }
-
