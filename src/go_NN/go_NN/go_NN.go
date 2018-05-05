@@ -99,9 +99,7 @@ func logistic_regression_example() {
     // normals gates. First we define all of the units for the inputs to the
     // SigmoidNode. This gives us the basic structure of logistic regression
     var b0 gates.Unit
-    var b1 gates.Unit
     var x0 gates.Unit
-    var x1 gates.Unit
     var bias gates.Unit
 
     // However, to optimize we need square error; these units will compute that
@@ -112,15 +110,12 @@ func logistic_regression_example() {
     // Next we create our networks gates; notice that the node is replacing
     // four individual gates. This means we no longer need to manually create
     // and populate these gates.
-    signode := nodes.NewSigmoidNode(&b0, &x0, &b1, &x1, &bias)
+    signode := nodes.NewSigmoidNode(&b0, &x0, &bias)
     subgate := gates.SubGate{ &y, signode.UOut_s0, &er }
     powergate := gates.PowerGate{ &er, &sqr_er, 2 }
 
     // set initial random value for the betas; typical for new nets
-    signode.Beta1.Value, signode.Bias.Value = rand.Float64() * 5 - 2.5, rand.Float64() * 5 - 2.5
-    
-    // b0 and x0 to zero since we're only doing univarient logistic regression
-    signode.Beta0.Value, signode.X0.Value = 0.0, 0.0
+    signode.Beta0.Value, signode.Bias.Value = rand.Float64() * 5 - 2.5, rand.Float64() * 5 - 2.5
 
     // Now we will use our net to perform stochastic gradient descent and find
     // parameters for our logistic regression
@@ -130,7 +125,7 @@ func logistic_regression_example() {
     for i := 0; i <= iters; i++ {
         // pick random training point and assign value to x and y
         idx = rand.Intn(20)
-        signode.X1.Value, y.Value = hours[idx], pass[idx]
+        signode.X0.Value, y.Value = hours[idx], pass[idx]
         
         // forward propagation
         signode.Forward()
@@ -144,14 +139,14 @@ func logistic_regression_example() {
         signode.Backward()
 
         // update the beta parameters
-        signode.Beta1.Value = signode.Beta1.Value - alpha * signode.Beta1.Gradient
+        signode.Beta0.Value = signode.Beta0.Value - alpha * signode.Beta0.Gradient
         signode.Bias.Value = signode.Bias.Value - alpha * signode.Bias.Gradient
     }
     fmt.Println("\nLogistic Regression Example")
     fmt.Println("\tNeural network trained for model y = sigmoid(b0 + b1 * x)")
     fmt.Println("\tTrained on students passing a test with x hours of studying")
     fmt.Println("\tTraining Epochs:", 100000/20, "learning rate:", alpha)
-    fmt.Println("\tOutput Model: y = sigmoid(", signode.Beta1.Value, "x +", signode.Bias.Value, ")")
+    fmt.Println("\tOutput Model: y = sigmoid(", signode.Beta0.Value, "x +", signode.Bias.Value, ")")
 }
 
 func sum_example() {
@@ -171,7 +166,8 @@ func main() {
     rand.Seed(time.Now().Unix())
     
     // example networks
-	linear_regression_example()
-    // logistic_regression_example()
-    // sum_example()
+    linear_regression_example()
+    logistic_regression_example()
+    sum_example()
 }
+
