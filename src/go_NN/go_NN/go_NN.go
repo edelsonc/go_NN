@@ -126,7 +126,7 @@ func logistic_regression_example() {
     // parameters for our logistic regression
     var idx int
     alpha := 0.1
-	iters := 100000
+    iters := 100000
     for i := 0; i <= iters; i++ {
         // pick random training point and assign value to x and y
         idx = rand.Intn(20)
