@@ -2,7 +2,6 @@ package nodes
 
 import (
     "go_NN/gates"
-    "fmt"
 )
 
 type SigmoidNode struct {
@@ -12,14 +11,14 @@ type SigmoidNode struct {
     Mult0 *gates.MultiplyGate
     UOut_m0 *gates.Unit
 
-    // Addition Combinati
+    // Addition Combination
     Plus0 *gates.AddGate
     UOut_p0 *gates.Unit
 
     // Bias and Sigmoid
     Bias *gates.Unit
     Sig0 *gates.SigmoidGate
-    UOut_s0 *gates.Unit
+    UOut *gates.Unit
 }
 
 func NewSigmoidNode(b0 *gates.Unit, x0 *gates.Unit, bias *gates.Unit ) SigmoidNode {
@@ -41,7 +40,7 @@ func NewSigmoidNode(b0 *gates.Unit, x0 *gates.Unit, bias *gates.Unit ) SigmoidNo
         UOut_p0: uOut_p0,
         Bias: bias,
         Sig0: s0,
-        UOut_s0: uOut_s0,
+        UOut: uOut_s0,
     }
 }
 
@@ -58,14 +57,16 @@ func (n SigmoidNode) Backward() {
 }
 
 
-// sum node; just needs to add all of the units together
+// sum node; sum up a slice of units 
 type SumNode struct {
     Inputs []*gates.Unit
     Intermediates []*gates.Unit
     SumGates []*gates.AddGate
+    UOut *gates.Unit
 }
 
 func NewSumNode(inputs []*gates.Unit) SumNode {
+    // constructor function for sumnode
     N_inputs := len(inputs)
     N_gates := N_inputs - 1
     intermediates := make([]*gates.Unit, N_gates)
@@ -82,15 +83,15 @@ func NewSumNode(inputs []*gates.Unit) SumNode {
     sumgates[0].UOut = intermediates[0]
     for i:=0; i<(N_gates - 1); i++ {
         sumgates[i + 1].U0 = intermediates[i]
-        sumgates[i + 1].U1 = inputs[i + 1]
+        sumgates[i + 1].U1 = inputs[i + 2]
         sumgates[i + 1].UOut = intermediates[i + 1]
     }
 
-    fmt.Println("here")
     return SumNode {
         Inputs: inputs,
         Intermediates: intermediates,
         SumGates: sumgates,
+        UOut: intermediates[len(intermediates) - 1],
     }
 }
 
@@ -103,6 +104,46 @@ func (n SumNode) Forward() {
 func (n SumNode) Backward() {
     for i:=len(n.SumGates) - 1; i >= 0; i-- {
         n.SumGates[i].Backward()
+    }
+}
+
+
+// product node; take the product of two input slices
+type ProductNode struct {
+    BetaVec []*gates.Unit
+    XVec []*gates.Unit
+    UOutVec []*gates.Unit
+    MultGateVec []*gates.MultiplyGate
+}
+
+func NewProductNode( betavec []*gates.Unit, xvec []*gates.Unit ) ProductNode {
+    N_inputs := len(betavec)
+    uoutvec := make([]*gates.Unit, N_inputs)
+    multgatevec := make([]*gates.MultiplyGate, N_inputs)
+    for i, _ := range xvec {
+        uout_i := &gates.Unit{}
+        mult_i := &gates.MultiplyGate{ betavec[i], xvec[i], uout_i }
+        uoutvec[i] = uout_i
+        multgatevec[i] = mult_i
+    }
+
+    return ProductNode {
+        BetaVec: betavec,
+        XVec: xvec,
+        UOutVec: uoutvec,
+        MultGateVec: multgatevec,
+    }
+}
+
+func (n ProductNode) Forward() {
+    for _, m := range n.MultGateVec {
+        m.Forward()
+    }
+}
+
+func (n ProductNode) Backward() {
+    for _, m := range n.MultGateVec {
+        m.Backward()
     }
 }
 

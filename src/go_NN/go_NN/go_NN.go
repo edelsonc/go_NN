@@ -111,7 +111,7 @@ func logistic_regression_example() {
     // four individual gates. This means we no longer need to manually create
     // and populate these gates.
     signode := nodes.NewSigmoidNode(&b0, &x0, &bias)
-    subgate := gates.SubGate{ &y, signode.UOut_s0, &er }
+    subgate := gates.SubGate{ &y, signode.UOut, &er }
     powergate := gates.PowerGate{ &er, &sqr_er, 2 }
 
     // set initial random value for the betas; typical for new nets
@@ -149,18 +149,6 @@ func logistic_regression_example() {
     fmt.Println("\tOutput Model: y = sigmoid(", signode.Beta0.Value, "x +", signode.Bias.Value, ")")
 }
 
-func sum_example() {
-    x0 := gates.Unit{ 10, 0 }
-    x1 := gates.Unit{ 2, 0 }
-    x2 := gates.Unit{ 2, 0 }
-    inputs := []*gates.Unit{ &x0, &x1, &x2 }
-    snode := nodes.NewSumNode(inputs)
-    snode.Forward()
-    snode.Intermediates[1].Gradient = 1.0
-    snode.Backward()
-    fmt.Println(snode.Intermediates[1], snode.Inputs[0])
-}
-
 func main() {
     // random seed for new results
     rand.Seed(time.Now().Unix())
@@ -168,6 +156,5 @@ func main() {
     // example networks
     linear_regression_example()
     logistic_regression_example()
-    sum_example()
 }
 
