@@ -10,14 +10,15 @@ Simple Neural Network in Go
 └── src
     └── go_NN
         ├── gates
-        │   └── gates.go
+        │   ├── gates.go
+        │   └── gates_test.go
         ├── go_NN
         │   └── go_NN.go
         ├── graphs
         │   └── graphs.go
         └── nodes
-            └── nodes.go
-
+            ├── nodes.go
+            └── nodes_test.go
 ```
 
 ### `gates.go`
