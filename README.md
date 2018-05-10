@@ -14,8 +14,9 @@ Simple Neural Network in Go
         │   └── gates_test.go
         ├── go_NN
         │   └── go_NN.go
-        ├── graphs
-        │   └── graphs.go
+        ├── layers
+        │   ├── layers.go
+        │   └── layers_test.go 
         └── nodes
             ├── nodes.go
             └── nodes_test.go
