@@ -68,6 +68,14 @@ type SumNode struct {
 func NewSumNode(inputs []*gates.Unit) SumNode {
     // constructor function for sumnode
     N_inputs := len(inputs)
+
+    // we want to deal with the special case of a single input to the node
+    if N_inputs == 1 {
+        u1 := gates.Unit{0, 0}
+        inputs = append(inputs, &u1)
+        N_inputs = len(inputs)
+    }
+
     N_gates := N_inputs - 1
     intermediates := make([]*gates.Unit, N_gates)
     sumgates := make([]*gates.AddGate, N_gates)

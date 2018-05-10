@@ -106,3 +106,18 @@ func (g SigmoidGate) Backward() {
     g.U0.Gradient = g.U0.Gradient + g.UOut.Gradient * sigmoid(g.U0.Value) * (1 - sigmoid(g.U0.Value))
 }
 
+// an idenditygate for f: x -> x
+type IdentityGate struct {
+    U0 *Unit
+    UOut *Unit
+}
+
+func (g IdentityGate) Forward() {
+    g.U0.Gradient = 0.0
+    g.UOut.Value, g.UOut.Gradient = g.U0.Value, 0.0
+}
+
+func (g IdentityGate) Backward() {
+    g.U0.Gradient = g.U0.Gradient + g.UOut.Gradient * 1
+}
+

@@ -23,6 +23,26 @@ func TestSigmoidNode(t *testing.T) {
     }
 }
 
+func TestSingleSumNode(t *testing.T) {
+    x0 := gates.Unit{10, 0}
+    inputs := []*gates.Unit{ &x0 }
+    snode := NewSumNode(inputs)
+    if len(snode.SumGates) != 1 {
+        t.Error("Created wrong number of gates ", len(snode.SumGates))
+    }
+    
+    snode.Forward()
+    if snode.UOut.Value != 10 {
+        t.Error("Single input value changed: 10 != ", snode.UOut.Value)
+    }
+
+    snode.UOut.Gradient = 42
+    snode.Backward()
+    if x0.Gradient != 42 {
+        t.Error("Backprop error: 42 != ", x0.Gradient)
+    }
+}
+
 func TestSumNode(t *testing.T) {
     x0 := gates.Unit{ 10, 0 }
     x1 := gates.Unit{ 2, 0 }

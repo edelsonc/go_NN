@@ -89,3 +89,19 @@ func TestSigmoidGate(t *testing.T) {
     }
 }
 
+func TestIdentityGate(t *testing.T) {
+    u0, uout := Unit{ 42, 0 }, Unit{}
+    ident0 := IdentityGate{&u0, &uout}
+    ident0.Forward()
+
+    if uout.Value != u0.Value {
+        t.Error("Identity changed value: 42 != ", uout.Value)
+    }
+
+    uout.Gradient = 11
+    ident0.Backward()
+    if u0.Gradient != uout.Gradient {
+        t.Error("Identity changed grad: 11 != ", u0.Value)
+    }
+}
+
