@@ -104,6 +104,7 @@ func TestDenseLayer(t *testing.T) {
         t.Error("Dense layer did not create the correct number of nodes or input shape is not maintained")
     }
 
+    // see that forward propogation just gives the sum for the value of each output
     denselayer.Forward()
     value_bool := make([]bool, 7)
     for i, units := range denselayer.UOutVec {
@@ -113,6 +114,22 @@ func TestDenseLayer(t *testing.T) {
 
     if !All(value_bool) {
         t.Error("Dense did not sum correctly: ", value_bool)
+    }
+
+
+    // check backpropogation now
+    for _, u := range denselayer.UOutVec {
+        u.Gradient = 1
+    }
+    denselayer.Backward()
+    grad_bool := make([]bool, len(inputs))
+    for i, u := range inputs {
+        check_grad := ( u.Gradient == 7.0 )
+        grad_bool [i] = check_grad
+    }
+
+    if !All(grad_bool) {
+        t.Error("Gradient did not backprop correctly:", grad_bool)
     }
 }
 
