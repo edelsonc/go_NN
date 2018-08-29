@@ -55,3 +55,40 @@ func (l SumLayer) Backward() {
         node.Backward()
     }
 }
+
+type DenseLayer struct {
+    Inputs []*gates.Unit
+    DenseVec []*nodes.SumNode
+    UOutVec []*gates.Unit
+    N int
+}
+
+func NewDenseLayer( inputs []*gates.Unit, n int ) DenseLayer {
+    // TODO Error if n < 1
+    var densevec []*nodes.SumNode
+    var uoutvec []*gates.Unit
+    for i := 0; i < n; i++ {
+        snode := nodes.NewSumNode(inputs)
+        densevec = append(densevec, &snode)
+        uoutvec = append(uoutvec, snode.UOut)
+    }
+    
+    return DenseLayer {
+        Inputs: inputs,
+        DenseVec: densevec,
+        UOutVec: uoutvec,
+    }
+}
+
+func (l DenseLayer) Forward() {
+    for _, node := range l.DenseVec {
+        node.Forward()
+    }
+}
+
+func (l DenseLayer) Backward() {
+    for _, node := range l.DenseVec {
+        node.Backward()
+    }
+}
+

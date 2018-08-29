@@ -87,3 +87,32 @@ func TestSumLayerMultipleOutputs(t *testing.T) {
     }
 }
 
+
+func TestDenseLayer(t *testing.T) {
+    inputs := make( []*gates.Unit, 10)
+    check_sum := 0.0
+    for i, _ := range inputs {
+        check_sum += float64(i)
+        unit_i := gates.Unit{ float64(i), 0 }
+        inputs[i] = &unit_i
+    }
+
+    // check to make sure that when we create a new dense layer with n nodes 
+    // we actually get n nodes
+    denselayer := NewDenseLayer(inputs, 7)
+    if len(denselayer.DenseVec) != 7 || len(denselayer.Inputs) != 10 {
+        t.Error("Dense layer did not create the correct number of nodes or input shape is not maintained")
+    }
+
+    denselayer.Forward()
+    value_bool := make([]bool, 7)
+    for i, units := range denselayer.UOutVec {
+        check_val := ( check_sum == units.Value )
+        value_bool[i] = check_val
+    }
+
+    if !All(value_bool) {
+        t.Error("Dense did not sum correctly: ", value_bool)
+    }
+}
+
